@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AuraOne Failure Gallery</title>
+  <style>
+    body { font-family: Inter, system-ui, sans-serif; margin: 0; color: #111827; background: #f8fafc; }
+    header { padding: 48px 32px 24px; background: #0f172a; color: white; }
+    main { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); padding: 32px; }
+    article { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 18px; }
+    h1, h2 { margin: 0 0 12px; }
+    code { display: block; white-space: normal; background: #f1f5f9; padding: 10px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AuraOne Failure Gallery</h1>
+    <p>Synthetic tutorial failures for reproducible agent and robotics diagnostics.</p>
+  </header>
+  <main>
+<article><h2>Tool schema drift breaks structured payloads</h2><p>The agent emits an old argument name after a tool contract changed.</p><p><strong>Label:</strong> schema-drift</p><p><strong>Finding:</strong> tool call uses deprecated field not accepted by current tool schema</p><p><strong>Tool:</strong> a2a-contract-test</p><code>a2a-contract-test run --agent-card examples/failing_agent/agent-card.json</code></article>
+<article><h2>Agent repeats a failing refund lookup tool</h2><p>A synthetic trace loops on the same tool call after identical 404 responses.</p><p><strong>Label:</strong> tool-call-loop</p><p><strong>Finding:</strong> retry policy missing terminal guard after repeated identical tool errors</p><p><strong>Tool:</strong> tool-call-replay</p><code>tool-call-replay run examples/failed_refund_trace.json --scenario examples/refund_scenario.yaml</code></article>
+<article><h2>Trace lacks decision rationale for escalation</h2><p>A synthetic support trace escalates without a durable decision record.</p><p><strong>Label:</strong> trace-card-gap</p><p><strong>Finding:</strong> trace card missing decision rationale and escalation evidence</p><p><strong>Tool:</strong> agent-trace-card</p><code>agent-trace-card generate examples/support_trace.json --out card.md</code></article>
+<article><h2>MCP server exposes destructive tool without confirmation</h2><p>A synthetic MCP manifest declares a delete operation without guard metadata.</p><p><strong>Label:</strong> mcp-risk</p><p><strong>Finding:</strong> destructive capability lacks confirmation and scope boundaries</p><p><strong>Tool:</strong> mcp-risk-linter</p><code>mcp-risk-linter lint examples/risky_server.json --out report.md</code></article>
+<article><h2>Trace export contains email and bearer token</h2><p>A synthetic GenAI trace includes sensitive values in prompt attributes.</p><p><strong>Label:</strong> trace-redaction</p><p><strong>Finding:</strong> eval case extraction redacts email and bearer token before export</p><p><strong>Tool:</strong> otel-eval-bridge</p><code>otel-eval-bridge extract examples/genai_trace.json --out eval_cases.jsonl</code></article>
+<article><h2>Prompt and rubric drift changes scoring boundaries</h2><p>A synthetic PR removes evidence criteria while tightening factuality language.</p><p><strong>Label:</strong> rubric-drift</p><p><strong>Finding:</strong> rubric weights changed and evidence criterion was removed</p><p><strong>Tool:</strong> prompt-rubric-drift</p><code>prompt-rubric-drift compare examples/before examples/after --out report.md</code></article>
+<article><h2>Camera shift causes VLA failure cluster</h2><p>A synthetic episode set shows brittleness when camera pose metadata changes.</p><p><strong>Label:</strong> vision-robustness</p><p><strong>Finding:</strong> camera_shift appears as a repeated failure cluster</p><p><strong>Tool:</strong> vla-robustness-kit</p><code>vla-robustness-kit run examples/mock_episode_set --policy mock --out report.md</code></article>
+<article><h2>Low-quality robot episode passes casual inspection</h2><p>A synthetic dataset has missing actions, short episodes, and inconsistent metadata.</p><p><strong>Label:</strong> dataset-quality</p><p><strong>Finding:</strong> quality gates produce multiple findings before training</p><p><strong>Tool:</strong> lerobot-quality-gates</p><code>lerobot-quality-gates check examples/bad_dataset --out report.md</code></article>
+<article><h2>Dataset card omits coordinate frames</h2><p>A synthetic robot dataset describes cameras and actions but omits frame definitions.</p><p><strong>Label:</strong> embodiment-metadata-gap</p><p><strong>Finding:</strong> schema validation catches missing coordinate_frames</p><p><strong>Tool:</strong> embodiment-card</p><code>embodiment-card validate examples/mock_so101_card.json</code></article>
+<article><h2>Recovery segment lacks intervention label</h2><p>A synthetic recovery segment omits the intervention type and recovery result.</p><p><strong>Label:</strong> recovery-label-gap</p><p><strong>Finding:</strong> segment is not training-ready because recovery metadata is incomplete</p><p><strong>Tool:</strong> robot-recovery-bench</p><code>robot-recovery-bench validate examples/mock_invalid_segments.jsonl</code></article>
+<article><h2>Robot episode has sensor timestamp desync</h2><p>A synthetic LeRobot-style episode has camera frames lagging proprioception.</p><p><strong>Label:</strong> sensor-desync</p><p><strong>Finding:</strong> episode fails timestamp alignment gate</p><p><strong>Tool:</strong> lerobot-quality-gates</p><code>lerobot-quality-gates check examples/bad_dataset --out report.md</code></article>
+<article><h2>VLA policy fails instruction paraphrases</h2><p>A synthetic VLA policy passes the original command but fails equivalent polite wording.</p><p><strong>Label:</strong> language-robustness</p><p><strong>Finding:</strong> language perturbation family has low pass rate</p><p><strong>Tool:</strong> vla-robustness-kit</p><code>vla-robustness-kit run examples/mock_episode_set --policy mock --out report.md</code></article>
+  </main>
+</body>
+</html>
