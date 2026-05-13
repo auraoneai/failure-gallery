@@ -188,14 +188,14 @@ def render_index(cases: list[dict]) -> str:
     }
 
     .hero {
-      padding: 76px 0 52px;
+      padding: 36px 0 34px;
     }
 
     .hero-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.06fr) minmax(280px, 0.94fr);
-      gap: 28px;
-      align-items: stretch;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+      gap: 18px;
+      align-items: start;
     }
 
     .hero-copy,
@@ -213,7 +213,7 @@ def render_index(cases: list[dict]) -> str:
     }
 
     .hero-copy {
-      padding: clamp(28px, 5vw, 54px);
+      padding: clamp(24px, 4vw, 38px);
     }
 
     .eyebrow {
@@ -238,25 +238,26 @@ def render_index(cases: list[dict]) -> str:
 
     h1 {
       max-width: 850px;
-      margin-top: 24px;
-      font-size: clamp(3rem, 7vw, 6.5rem);
-      line-height: 0.93;
+      max-width: 760px;
+      margin-top: 18px;
+      font-size: clamp(2.6rem, 5vw, 5rem);
+      line-height: 0.96;
       letter-spacing: 0;
     }
 
     .lead {
-      max-width: 690px;
-      margin-top: 24px;
+      max-width: 660px;
+      margin-top: 18px;
       color: var(--muted);
-      font-size: clamp(1rem, 2vw, 1.2rem);
-      line-height: 1.7;
+      font-size: clamp(0.98rem, 1.4vw, 1.08rem);
+      line-height: 1.62;
     }
 
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      margin-top: 30px;
+      margin-top: 22px;
     }
 
     .button.primary {
@@ -267,15 +268,16 @@ def render_index(cases: list[dict]) -> str:
 
     .stats-panel {
       display: grid;
-      gap: 14px;
-      padding: 22px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding: 18px;
     }
 
     .metric {
-      min-height: 104px;
+      min-height: 128px;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 14px;
-      padding: 18px;
+      padding: 16px;
       background: rgba(0, 0, 0, 0.22);
     }
 
@@ -438,7 +440,7 @@ def render_index(cases: list[dict]) -> str:
       }
 
       .hero {
-        padding-top: 42px;
+        padding-top: 32px;
       }
     }
 
@@ -454,6 +456,10 @@ def render_index(cases: list[dict]) -> str:
 
       .nav-links {
         justify-content: flex-start;
+      }
+
+      .stats-panel {
+        grid-template-columns: 1fr;
       }
 
       .hero-copy,
