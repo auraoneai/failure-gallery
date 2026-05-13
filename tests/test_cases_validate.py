@@ -17,5 +17,5 @@ def test_static_site_renders(tmp_path: Path):
     assert main(["render", "cases", "--out", str(out)]) == 0
     text = out.read_text(encoding="utf-8")
     assert "AuraOne Failure Gallery" in text
-    assert "Synthetic tutorial failures" in text
-
+    assert "Failures worth reviewing before they reach production" in text
+    assert "AuraGlass" in text
