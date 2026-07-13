@@ -4,13 +4,32 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "failure-gallery"
-version = "0.1.0"
-description = "Synthetic gallery of reproducible agent and robotics failure cases."
+version = "0.2.1"
+description = "Validate and build a synthetic agent and robotics failure gallery with reproducible review records."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 authors = [{ name = "AuraOne", email = "opensource@auraone.ai" }]
-keywords = ["agents", "robotics", "failures", "evals", "synthetic-data"]
+keywords = ["agent-evaluation", "robotics-evaluation", "failure-analysis", "review-fixtures", "evals", "synthetic-data"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Testing",
+]
+
+[project.urls]
+Homepage = "https://auraoneai.github.io/failure-gallery/"
+Documentation = "https://github.com/auraoneai/failure-gallery#readme"
+Repository = "https://github.com/auraoneai/failure-gallery.git"
+Issues = "https://github.com/auraoneai/failure-gallery/issues"
+Changelog = "https://github.com/auraoneai/failure-gallery/blob/main/CHANGELOG.md"
 
 [project.scripts]
 failure-gallery = "failure_gallery.cli:main"
@@ -18,6 +37,8 @@ failure-gallery = "failure_gallery.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+failure_gallery = ["static/*.css", "static/*.js"]
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
-

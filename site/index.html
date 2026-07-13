@@ -3,487 +3,1898 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="AuraOne Failure Gallery publishes synthetic agent and robotics failures with reproducible local commands.">
-  <title>AuraOne Failure Gallery</title>
+  <meta name="description" content="AuraOne Failure Gallery publishes synthetic agent and robotics failures with reproducible local commands and review evidence.">
+  <meta name="color-scheme" content="light">
+  <title>Failure Gallery | AuraOne Open</title>
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #050816;
-      --ink: #f8fbff;
-      --muted: rgba(232, 241, 255, 0.68);
-      --line: rgba(255, 255, 255, 0.14);
-      --panel: rgba(11, 18, 36, 0.68);
-      --panel-strong: rgba(7, 12, 26, 0.82);
-      --cyan: #67e8f9;
-      --mint: #6ee7b7;
-      --violet: #c4b5fd;
-      --amber: #fcd34d;
-      --radius: 18px;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    * {
-      box-sizing: border-box;
-    }
+[hidden] {
+  display: none !important;
+}
 
-    html {
-      min-height: 100%;
-      background: var(--bg);
-    }
+:root {
+  color-scheme: light;
+  --canvas: #f5f7fa;
+  --canvas-subtle: #f8fafc;
+  --surface: #ffffff;
+  --surface-inset: #eef2f6;
+  --surface-hover: #f0f4f7;
+  --surface-selected: #dceff1;
+  --text: #101820;
+  --text-secondary: #3f4b59;
+  --text-muted: #626f7e;
+  --text-faint: #8a95a3;
+  --brand: #007582;
+  --brand-hover: #006a75;
+  --focus: #0b6cff;
+  --border: #e3e8ee;
+  --border-strong: #d5dde6;
+  --border-emphasis: #b8c3cf;
+  --success: #1e7a52;
+  --success-bg: #e8f5ee;
+  --warning: #8b5b00;
+  --warning-bg: #fff5dc;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
 
-    body {
-      min-height: 100%;
-      margin: 0;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at 14% 4%, rgba(34, 211, 238, 0.24), transparent 28rem),
-        radial-gradient(circle at 86% 8%, rgba(168, 85, 247, 0.22), transparent 30rem),
-        radial-gradient(circle at 50% 100%, rgba(16, 185, 129, 0.16), transparent 34rem),
-        linear-gradient(180deg, #050816 0%, #07111f 52%, #040712 100%);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      letter-spacing: 0;
-    }
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+  background: var(--canvas);
+}
 
-    body::before {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      content: "";
-      opacity: 0.34;
-      background-image:
-        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-      background-size: 56px 56px;
-      mask-image: linear-gradient(180deg, black, transparent 78%);
-    }
+body {
+  min-width: 320px;
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--canvas);
+  color: var(--text);
+}
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+button,
+input,
+select,
+a {
+  color: inherit;
+  font: inherit;
+  letter-spacing: 0;
+}
 
-    .shell {
-      width: min(1180px, calc(100% - 32px));
-      margin: 0 auto;
-    }
+button {
+  cursor: pointer;
+}
 
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      padding: 24px 0;
-    }
+a {
+  text-decoration: none;
+}
 
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 760;
-    }
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--focus) 28%, transparent);
+  outline-offset: 2px;
+}
 
-    .brand-mark {
-      display: inline-grid;
-      width: 36px;
-      height: 36px;
-      place-items: center;
-      border: 1px solid rgba(103, 232, 249, 0.32);
-      border-radius: 12px;
-      background:
-        linear-gradient(135deg, rgba(103, 232, 249, 0.18), rgba(196, 181, 253, 0.12)),
-        rgba(255, 255, 255, 0.06);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 18px 44px rgba(0, 0, 0, 0.32);
-      color: var(--cyan);
-    }
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 20;
+  transform: translateY(-140%);
+  border-radius: 4px;
+  background: var(--text);
+  color: white;
+  padding: 10px 14px;
+}
 
-    .nav-links {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 10px;
-    }
+.skip-link:focus {
+  transform: translateY(0);
+}
 
-    .nav-links a,
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 40px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 0 14px;
-      background: rgba(255, 255, 255, 0.055);
-      color: rgba(255, 255, 255, 0.82);
-      font-size: 0.86rem;
-      font-weight: 660;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13);
-    }
+.site-header,
+main,
+.site-footer {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
 
-    .nav-links a:hover,
-    .button:hover {
-      border-color: rgba(103, 232, 249, 0.45);
-      background: rgba(103, 232, 249, 0.11);
-      color: white;
-    }
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--border-strong);
+}
 
-    .hero {
-      padding: 36px 0 34px;
-    }
+.brand,
+.site-header nav,
+.case-card__meta,
+.case-action,
+.dialog-shell > footer,
+.site-footer {
+  display: flex;
+  align-items: center;
+}
 
-    .hero-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-      gap: 18px;
-      align-items: start;
-    }
+.brand {
+  gap: 8px;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
 
-    .hero-copy,
-    .glass-panel,
-    .case-card {
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)),
-        var(--panel);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.18),
-        0 28px 92px rgba(0, 0, 0, 0.34);
-      backdrop-filter: blur(22px) saturate(150%);
-    }
+.brand strong {
+  color: var(--text);
+  font-size: 16px;
+}
 
-    .hero-copy {
-      padding: clamp(24px, 4vw, 38px);
-    }
+.brand-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-strong);
+}
 
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid rgba(103, 232, 249, 0.28);
-      border-radius: 999px;
-      padding: 8px 12px;
-      background: rgba(103, 232, 249, 0.10);
-      color: var(--cyan);
-      font-size: 0.78rem;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
+.site-header nav {
+  gap: 18px;
+}
 
-    h1,
-    h2,
-    p {
-      margin: 0;
-    }
+.site-header nav a,
+.site-footer a {
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 700;
+}
 
-    h1 {
-      max-width: 850px;
-      max-width: 760px;
-      margin-top: 18px;
-      font-size: clamp(2.6rem, 5vw, 5rem);
-      line-height: 0.96;
-      letter-spacing: 0;
-    }
+.intro {
+  max-width: 850px;
+  padding: 72px 0 48px;
+}
 
-    .lead {
-      max-width: 660px;
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: clamp(0.98rem, 1.4vw, 1.08rem);
-      line-height: 1.62;
-    }
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--brand);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
 
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 22px;
-    }
+h1,
+h2,
+h3,
+p,
+dl,
+dd {
+  margin: 0;
+}
 
-    .button.primary {
-      border-color: rgba(103, 232, 249, 0.42);
-      background: linear-gradient(135deg, rgba(103, 232, 249, 0.22), rgba(110, 231, 183, 0.14));
-      color: white;
-    }
+h1 {
+  font-size: 76px;
+  line-height: 0.98;
+}
 
-    .stats-panel {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      padding: 18px;
-    }
+.lede {
+  max-width: 720px;
+  margin-top: 20px;
+  color: var(--text-secondary);
+  font-size: 18px;
+  line-height: 1.6;
+}
 
-    .metric {
-      min-height: 128px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 14px;
-      padding: 16px;
-      background: rgba(0, 0, 0, 0.22);
-    }
+.disclosure {
+  margin-top: 26px;
+  border-left: 3px solid var(--success);
+  background: var(--success-bg);
+  padding: 13px 16px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
 
-    .metric-value {
-      display: block;
-      color: white;
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 780;
-      line-height: 1;
-    }
+.disclosure strong {
+  color: var(--success);
+}
 
-    .metric-label {
-      display: block;
-      margin-top: 10px;
-      color: rgba(255, 255, 255, 0.58);
-      font-size: 0.8rem;
-      font-weight: 720;
-      text-transform: uppercase;
-    }
+.catalog {
+  padding: 34px 0 56px;
+  border-top: 1px solid var(--border-strong);
+}
 
-    .section-head {
-      display: grid;
-      gap: 16px;
-      margin: 36px 0 24px;
-    }
+.catalog-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+}
 
-    .section-head h2 {
-      max-width: 820px;
-      font-size: clamp(2rem, 4.5vw, 3.8rem);
-      line-height: 1;
-      letter-spacing: 0;
-    }
+.catalog-heading h2,
+.method h2 {
+  font-size: 28px;
+  line-height: 1.15;
+}
 
-    .section-head p {
-      max-width: 760px;
-      color: var(--muted);
-      line-height: 1.7;
-    }
+.result-count {
+  color: var(--text-muted);
+  font-size: 13px;
+}
 
-    .case-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-      padding-bottom: 60px;
-    }
+.result-count strong {
+  color: var(--text);
+}
 
-    .case-card {
-      display: flex;
-      min-height: 390px;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 22px;
-    }
+.filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto minmax(190px, 0.55fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin: 24px 0;
+  border-block: 1px solid var(--border);
+  background: var(--canvas-subtle);
+  padding: 16px;
+}
 
-    .case-topline {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
+.filters label > span,
+.filters legend {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
 
-    .case-domain,
-    .case-tool {
-      display: inline-flex;
-      align-items: center;
-      min-height: 28px;
-      border-radius: 999px;
-      padding: 0 10px;
-      font-size: 0.72rem;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
+.filters fieldset {
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
 
-    .case-domain {
-      border: 1px solid rgba(110, 231, 183, 0.28);
-      background: rgba(110, 231, 183, 0.10);
-      color: var(--mint);
-    }
+.search-field input,
+.select-field select,
+.reset-button {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  padding: 0 12px;
+}
 
-    .case-tool {
-      border: 1px solid rgba(196, 181, 253, 0.30);
-      background: rgba(196, 181, 253, 0.10);
-      color: var(--violet);
-    }
+.search-field input:focus,
+.select-field select:focus {
+  border-color: var(--focus);
+}
 
-    .case-card h2 {
-      font-size: 1.23rem;
-      line-height: 1.24;
-      letter-spacing: 0;
-    }
+.segmented-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(72px, 1fr));
+  min-height: 42px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--surface);
+}
 
-    .case-description {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 0.94rem;
-      line-height: 1.62;
-    }
+.segmented-control label {
+  position: relative;
+  margin: 0;
+}
 
-    .case-facts {
-      display: grid;
-      gap: 10px;
-      margin: 18px 0;
-    }
+.segmented-control input {
+  position: absolute;
+  opacity: 0;
+}
 
-    .case-facts div {
-      border-left: 2px solid rgba(103, 232, 249, 0.38);
-      padding-left: 12px;
-    }
+.segmented-control label > span {
+  display: grid;
+  height: 40px;
+  margin: 0;
+  place-items: center;
+  border-right: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: none;
+}
 
-    dt {
-      color: rgba(255, 255, 255, 0.46);
-      font-size: 0.72rem;
-      font-weight: 760;
-      text-transform: uppercase;
-    }
+.segmented-control label:last-child > span {
+  border-right: 0;
+}
 
-    dd {
-      margin: 5px 0 0;
-      color: rgba(255, 255, 255, 0.82);
-      font-size: 0.9rem;
-      line-height: 1.45;
-    }
+.segmented-control input:checked + span {
+  background: var(--surface-selected);
+  color: var(--brand-hover);
+}
 
-    code {
-      display: block;
-      overflow-x: auto;
-      border: 1px solid rgba(110, 231, 183, 0.20);
-      border-radius: 12px;
-      padding: 12px;
-      background: rgba(0, 0, 0, 0.34);
-      color: #bbf7d0;
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-      font-size: 0.78rem;
-      line-height: 1.55;
-      white-space: pre-wrap;
-    }
+.segmented-control input:focus-visible + span {
+  outline: 3px solid color-mix(in srgb, var(--focus) 28%, transparent);
+  outline-offset: -3px;
+}
 
-    .note {
-      display: grid;
-      gap: 10px;
-      margin: 0 0 54px;
-      padding: 22px;
-    }
+.reset-button {
+  width: auto;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
 
-    .note strong {
-      color: var(--amber);
-    }
+.reset-button:hover {
+  background: var(--surface-hover);
+}
 
-    .note p {
-      color: var(--muted);
-      line-height: 1.65;
-    }
+.case-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
 
-    @media (max-width: 920px) {
-      .hero-grid,
-      .case-grid {
-        grid-template-columns: 1fr;
-      }
+.case-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  padding: 20px;
+}
 
-      .hero {
-        padding-top: 32px;
-      }
-    }
+.case-card:hover {
+  border-color: var(--border-emphasis);
+}
 
-    @media (max-width: 640px) {
-      .shell {
-        width: min(100% - 24px, 1180px);
-      }
+.case-card__meta {
+  flex-wrap: wrap;
+  gap: 7px;
+}
 
-      .nav {
-        align-items: flex-start;
-        flex-direction: column;
-      }
+.domain-label,
+.data-label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  border-radius: 4px;
+  padding: 0 7px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
 
-      .nav-links {
-        justify-content: flex-start;
-      }
+.domain-label {
+  background: var(--surface-selected);
+  color: var(--brand-hover);
+}
 
-      .stats-panel {
-        grid-template-columns: 1fr;
-      }
+.data-label {
+  background: var(--success-bg);
+  color: var(--success);
+}
 
-      .hero-copy,
-      .stats-panel,
-      .case-card,
-      .note {
-        border-radius: 14px;
-      }
-    }
+.case-card h2 {
+  margin-top: 15px;
+  overflow-wrap: anywhere;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.case-card > p {
+  margin-top: 9px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.case-card dl {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.case-card dl div {
+  border-top: 1px solid var(--border);
+  padding-top: 9px;
+}
+
+.case-card dt,
+.record-section h3 {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.case-card dd {
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+code {
+  font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+.case-action {
+  justify-content: space-between;
+  width: 100%;
+  min-height: 42px;
+  margin-top: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  background: var(--surface);
+  padding: 0 11px;
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.case-action:hover {
+  border-color: var(--brand);
+  background: var(--surface-selected);
+}
+
+.no-results {
+  border: 1px dashed var(--border-emphasis);
+  border-radius: 6px;
+  padding: 48px 20px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.no-results p {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.method {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  gap: 40px;
+  padding: 50px 0 72px;
+  border-top: 1px solid var(--border-strong);
+}
+
+.method ol {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.method li {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 16px;
+  border-top: 1px solid var(--border);
+  padding: 15px 0;
+}
+
+.method li:first-child {
+  border-top: 0;
+}
+
+.method li strong {
+  color: var(--brand);
+}
+
+.method li span {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.site-footer {
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 64px;
+  border-top: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.case-dialog {
+  width: min(760px, calc(100% - 24px));
+  max-height: calc(100vh - 24px);
+  margin: auto;
+  overflow: hidden;
+  border: 1px solid var(--border-emphasis);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 0;
+  color: var(--text);
+}
+
+.case-dialog::backdrop {
+  background: rgb(16 24 32 / 0.52);
+}
+
+.dialog-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  max-height: calc(100vh - 24px);
+}
+
+.dialog-shell > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+  padding: 20px 22px;
+}
+
+.dialog-shell > header h2 {
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.icon-button {
+  display: grid;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  background: var(--surface);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.dialog-body {
+  display: grid;
+  gap: 20px;
+  overflow-y: auto;
+  padding: 22px;
+}
+
+.record-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.record-section {
+  min-width: 0;
+  border-left: 2px solid var(--border-strong);
+  padding-left: 12px;
+}
+
+.record-section p {
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.record-section.limitations {
+  border-left-color: #dfc273;
+  background: var(--warning-bg);
+  padding: 12px 14px;
+}
+
+.command-block {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #111820;
+}
+
+.command-block code {
+  overflow-x: auto;
+  padding: 14px;
+  color: #e8eef5;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.command-block button {
+  min-width: 108px;
+  border: 0;
+  border-left: 1px solid #3f4b59;
+  background: #1c2732;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dialog-shell > footer {
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  background: var(--canvas-subtle);
+  padding: 14px 22px;
+}
+
+.dialog-shell > footer a {
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.secondary-button {
+  min-height: 40px;
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  background: var(--surface);
+  padding: 0 14px;
+  font-weight: 700;
+}
+
+@media (max-width: 940px) {
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .case-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .site-header,
+  main,
+  .site-footer {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 13px 0;
+  }
+
+  .site-header nav {
+    flex-wrap: wrap;
+  }
+
+  .intro {
+    padding: 48px 0 36px;
+  }
+
+  h1 {
+    font-size: 44px;
+  }
+
+  .catalog-heading,
+  .method,
+  .site-footer {
+    align-items: flex-start;
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-heading {
+    flex-direction: column;
+  }
+
+  .filters,
+  .case-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    padding: 12px;
+  }
+
+  .search-field input,
+  .select-field select,
+  .reset-button,
+  .segmented-control,
+  .case-action {
+    min-height: 44px;
+  }
+
+  .method {
+    gap: 20px;
+  }
+
+  .site-footer {
+    display: grid;
+    padding: 16px 0;
+  }
+
+  .record-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .command-block {
+    grid-template-columns: 1fr;
+  }
+
+  .command-block button {
+    min-height: 44px;
+    border-top: 1px solid #3f4b59;
+    border-left: 0;
+  }
+}
+
+@media (max-width: 400px) {
+  .brand {
+    flex-wrap: wrap;
+  }
+
+  .segmented-control {
+    grid-template-columns: 1fr;
+  }
+
+  .segmented-control label > span {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .segmented-control label:last-child > span {
+    border-bottom: 0;
+  }
+
+  .dialog-shell > header,
+  .dialog-body,
+  .dialog-shell > footer {
+    padding-inline: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
   </style>
 </head>
 <body>
-  <nav class="shell nav" aria-label="Primary">
+  <a class="skip-link" href="#case-index">Skip to failure records</a>
+  <header class="site-header">
     <a class="brand" href="https://www.auraone.ai/open">
-      <span class="brand-mark" aria-hidden="true">A1</span>
-      <span>AuraOne Failure Gallery</span>
+      <strong>AuraOne</strong>
+      <span>Open</span>
+      <span class="brand-divider" aria-hidden="true"></span>
+      <span>Failure Gallery</span>
     </a>
-    <div class="nav-links">
-      <a href="https://www.auraone.ai/open/v2">Open v2</a>
-      <a href="https://auraglass.auraone.ai/">AuraGlass</a>
+    <nav aria-label="Open source links">
+      <a href="https://www.auraone.ai/open/trust-toolkit">Trust Toolkit</a>
       <a href="https://github.com/auraoneai/failure-gallery">GitHub</a>
-    </div>
-  </nav>
-
-  <header class="shell hero">
-    <div class="hero-grid">
-      <section class="hero-copy">
-        <span class="eyebrow">Synthetic cases · AuraGlass surface</span>
-        <h1>Failures worth reviewing before they reach production.</h1>
-        <p class="lead">
-          A public gallery of synthetic agent and robotics failures with the label,
-          expected finding, related AuraOne tool, and local command needed to
-          reproduce the review path.
-        </p>
-        <div class="hero-actions">
-          <a class="button primary" href="#cases">Browse cases</a>
-          <a class="button" href="https://pypi.org/project/failure-gallery/">Install from PyPI</a>
-        </div>
-      </section>
-
-      <aside class="glass-panel stats-panel" aria-label="Gallery summary">
-<div class="metric"><span class="metric-value">12</span><span class="metric-label">failure cases</span></div>
-<div class="metric"><span class="metric-value">10</span><span class="metric-label">related tools</span></div>
-<div class="metric"><span class="metric-value">6</span><span class="metric-label">agent cases</span></div>
-<div class="metric"><span class="metric-value">6</span><span class="metric-label">robotics cases</span></div>
-      </aside>
-    </div>
+    </nav>
   </header>
 
-  <main class="shell">
-    <section class="section-head" id="cases">
-      <span class="eyebrow">Case library</span>
-      <h2>Agent loops, trace gaps, robot metadata drift, and VLA brittleness.</h2>
-      <p>
-        Every item is intentionally synthetic and designed for local diagnostics.
-        12 of 12 cases are marked synthetic, so
-        the page can be shared without implying private customer incidents,
-        real lab data, or third-party endorsement.
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">Reproducible review records</p>
+      <h1 id="page-title">Failure Gallery</h1>
+      <p class="lede">
+        Synthetic agent and robotics failures with the source, expected finding,
+        evidence boundary, and local command required to reproduce each review path.
       </p>
+      <div class="disclosure" role="note">
+        <strong>Approved public data:</strong>
+        All 12 records are synthetic tutorial fixtures. They contain no customer or private lab data.
+      </div>
     </section>
 
-    <section class="case-grid" aria-label="Failure cases">
-<article class="case-card"><div class="case-topline"><span class="case-domain">agent</span><span class="case-tool">tool-call-replay</span></div><h2>Agent repeats a failing refund lookup tool</h2><p class="case-description">A synthetic trace loops on the same tool call after identical 404 responses.</p><dl class="case-facts"><div><dt>Review label</dt><dd>tool-call-loop</dd></div><div><dt>Expected finding</dt><dd>retry policy missing terminal guard after repeated identical tool errors</dd></div></dl><code>tool-call-replay run examples/failed_refund_trace.json --scenario examples/refund_scenario.yaml</code></article>
-<article class="case-card"><div class="case-topline"><span class="case-domain">agent</span><span class="case-tool">mcp-risk-linter</span></div><h2>MCP server exposes destructive tool without confirmation</h2><p class="case-description">A synthetic MCP manifest declares a delete operation without guard metadata.</p><dl class="case-facts"><div><dt>Review label</dt><dd>mcp-risk</dd></div><div><dt>Expected finding</dt><dd>destructive capability lacks confirmation and scope boundaries</dd></div></dl><code>mcp-risk-linter lint examples/risky_server.json --out report.md</code></article>
-<article class="case-card"><div class="case-topline"><span class="case-domain">agent</span><span class="case-tool">prompt-rubric-drift</span></div><h2>Prompt and rubric drift changes scoring boundaries</h2><p class="case-description">A synthetic PR removes evidence criteria while tightening factuality language.</p><dl class="case-facts"><div><dt>Review label</dt><dd>rubric-drift</dd></div><div><dt>Expected finding</dt><dd>rubric weights changed and evidence criterion was removed</dd></div></dl><code>prompt-rubric-drift compare examples/before examples/after --out report.md</code></article>
-<article class="case-card"><div class="case-topline"><span class="case-domain">agent</span><span class="case-tool">a2a-contract-test</span></div><h2>Tool schema drift breaks structured payloads</h2><p class="case-description">The agent emits an old argument name after a tool contract changed.</p><dl class="case-facts"><div><dt>Review label</dt><dd>schema-drift</dd></div><div><dt>Expected finding</dt><dd>tool call uses deprecated field not accepted by current tool schema</dd></div></dl><code>a2a-contract-test run --agent-card examples/failing_agent/agent-card.json</code></article>
-<article class="case-card"><div class="case-topline"><span class="case-domain">agent</span><span class="case-tool">otel-eval-bridge</span></div><h2>Trace export contains email and bearer token</h2><p class="case-description">A synthetic GenAI trace includes sensitive values in prompt attributes.</p><dl class="case-facts"><div><dt>Review label</dt><dd>trace-redaction</dd></div><div><dt>Expected finding</dt><dd>eval case extraction redacts email and bearer token before export</dd></div></dl><code>otel-eval-bridge extract examples/genai_trace.json --out eval_cases.jsonl</code></article>
-<article class="case-card"><div class="case-topline"><span class="case-domain">agent</span><span class="case-tool">agent-trace-card</span></div><h2>Trace lacks decision rationale for escalation</h2><p class="case-description">A synthetic support trace escalates without a durable decision record.</p><dl class="case-facts"><div><dt>Review label</dt><dd>trace-card-gap</dd></div><div><dt>Expected finding</dt><dd>trace card missing decision rationale and escalation evidence</dd></div></dl><code>agent-trace-card generate examples/support_trace.json --out card.md</code></article>
-<article class="case-card"><div class="case-topline"><span class="case-domain">robotics</span><span class="case-tool">vla-robustness-kit</span></div><h2>Camera shift causes VLA failure cluster</h2><p class="case-description">A synthetic episode set shows brittleness when camera pose metadata changes.</p><dl class="case-facts"><div><dt>Review label</dt><dd>vision-robustness</dd></div><div><dt>Expected finding</dt><dd>camera_shift appears as a repeated failure cluster</dd></div></dl><code>vla-robustness-kit run examples/mock_episode_set --policy mock --out report.md</code></article>
-<article class="case-card"><div class="case-topline"><span class="case-domain">robotics</span><span class="case-tool">embodiment-card</span></div><h2>Dataset card omits coordinate frames</h2><p class="case-description">A synthetic robot dataset describes cameras and actions but omits frame definitions.</p><dl class="case-facts"><div><dt>Review label</dt><dd>embodiment-metadata-gap</dd></div><div><dt>Expected finding</dt><dd>schema validation catches missing coordinate_frames</dd></div></dl><code>embodiment-card validate examples/mock_so101_card.json</code></article>
-<article class="case-card"><div class="case-topline"><span class="case-domain">robotics</span><span class="case-tool">lerobot-quality-gates</span></div><h2>Low-quality robot episode passes casual inspection</h2><p class="case-description">A synthetic dataset has missing actions, short episodes, and inconsistent metadata.</p><dl class="case-facts"><div><dt>Review label</dt><dd>dataset-quality</dd></div><div><dt>Expected finding</dt><dd>quality gates produce multiple findings before training</dd></div></dl><code>lerobot-quality-gates check examples/bad_dataset --out report.md</code></article>
-<article class="case-card"><div class="case-topline"><span class="case-domain">robotics</span><span class="case-tool">robot-recovery-bench</span></div><h2>Recovery segment lacks intervention label</h2><p class="case-description">A synthetic recovery segment omits the intervention type and recovery result.</p><dl class="case-facts"><div><dt>Review label</dt><dd>recovery-label-gap</dd></div><div><dt>Expected finding</dt><dd>segment is not training-ready because recovery metadata is incomplete</dd></div></dl><code>robot-recovery-bench validate examples/mock_invalid_segments.jsonl</code></article>
-<article class="case-card"><div class="case-topline"><span class="case-domain">robotics</span><span class="case-tool">lerobot-quality-gates</span></div><h2>Robot episode has sensor timestamp desync</h2><p class="case-description">A synthetic LeRobot-style episode has camera frames lagging proprioception.</p><dl class="case-facts"><div><dt>Review label</dt><dd>sensor-desync</dd></div><div><dt>Expected finding</dt><dd>episode fails timestamp alignment gate</dd></div></dl><code>lerobot-quality-gates check examples/bad_dataset --out report.md</code></article>
-<article class="case-card"><div class="case-topline"><span class="case-domain">robotics</span><span class="case-tool">vla-robustness-kit</span></div><h2>VLA policy fails instruction paraphrases</h2><p class="case-description">A synthetic VLA policy passes the original command but fails equivalent polite wording.</p><dl class="case-facts"><div><dt>Review label</dt><dd>language-robustness</dd></div><div><dt>Expected finding</dt><dd>language perturbation family has low pass rate</dd></div></dl><code>vla-robustness-kit run examples/mock_episode_set --policy mock --out report.md</code></article>
+    <section class="catalog" id="case-index" aria-labelledby="catalog-title">
+      <div class="catalog-heading">
+        <div>
+          <p class="eyebrow">Record index</p>
+          <h2 id="catalog-title">Browse failures</h2>
+        </div>
+        <p class="result-count" aria-live="polite"><strong data-visible-count>12</strong> of 12 records</p>
+      </div>
+
+      <form class="filters" role="search" data-filters>
+        <label class="search-field">
+          <span>Search records</span>
+          <input type="search" name="query" placeholder="Search failure, tool, label…" autocomplete="off">
+        </label>
+        <fieldset>
+          <legend>Domain</legend>
+          <div class="segmented-control">
+            <label><input type="radio" name="domain" value="all" checked><span>All</span></label>
+            <label><input type="radio" name="domain" value="agent"><span>Agent</span></label>
+            <label><input type="radio" name="domain" value="robotics"><span>Robotics</span></label>
+          </div>
+        </fieldset>
+        <label class="select-field">
+          <span>Related tool</span>
+          <select name="tool">
+            <option value="all">All tools</option>
+          <option value="a2a-contract-test">a2a-contract-test</option>
+          <option value="agent-trace-card">agent-trace-card</option>
+          <option value="embodiment-card">embodiment-card</option>
+          <option value="lerobot-quality-gates">lerobot-quality-gates</option>
+          <option value="mcp-risk-linter">mcp-risk-linter</option>
+          <option value="otel-eval-bridge">otel-eval-bridge</option>
+          <option value="prompt-rubric-drift">prompt-rubric-drift</option>
+          <option value="robot-recovery-bench">robot-recovery-bench</option>
+          <option value="tool-call-replay">tool-call-replay</option>
+          <option value="vla-robustness-kit">vla-robustness-kit</option>
+          </select>
+        </label>
+        <button class="reset-button" type="reset">Reset filters</button>
+      </form>
+
+      <div class="case-grid" data-case-grid>
+
+      <article class="case-card" id="agent_tool_loop" data-case data-domain="agent" data-tool="tool-call-replay" data-search="agent_tool_loop agent agent repeats a failing refund lookup tool a synthetic trace loops on the same tool call after identical 404 responses. tool-call-loop retry policy missing terminal guard after repeated identical tool errors tool-call-replay">
+        <div class="case-card__meta">
+          <span class="domain-label">agent</span>
+          <span class="data-label">Synthetic data</span>
+        </div>
+        <h2>Agent repeats a failing refund lookup tool</h2>
+        <p>A synthetic trace loops on the same tool call after identical 404 responses.</p>
+        <dl>
+          <div><dt>Tool</dt><dd>tool-call-replay</dd></div>
+          <div><dt>Source</dt><dd><code>cases/agent_tool_loop/case.json</code></dd></div>
+          <div><dt>Expected behavior</dt><dd>retry policy missing terminal guard after repeated identical tool errors</dd></div>
+        </dl>
+        <button class="case-action" type="button" data-open-case="agent_tool_loop" aria-haspopup="dialog">
+          Review evidence
+          <span aria-hidden="true">→</span>
+        </button>
+      </article>
+
+      <article class="case-card" id="mcp_destructive_tool" data-case data-domain="agent" data-tool="mcp-risk-linter" data-search="mcp_destructive_tool agent mcp server exposes destructive tool without confirmation a synthetic mcp manifest declares a delete operation without guard metadata. mcp-risk destructive capability lacks confirmation and scope boundaries mcp-risk-linter">
+        <div class="case-card__meta">
+          <span class="domain-label">agent</span>
+          <span class="data-label">Synthetic data</span>
+        </div>
+        <h2>MCP server exposes destructive tool without confirmation</h2>
+        <p>A synthetic MCP manifest declares a delete operation without guard metadata.</p>
+        <dl>
+          <div><dt>Tool</dt><dd>mcp-risk-linter</dd></div>
+          <div><dt>Source</dt><dd><code>cases/mcp_destructive_tool/case.json</code></dd></div>
+          <div><dt>Expected behavior</dt><dd>destructive capability lacks confirmation and scope boundaries</dd></div>
+        </dl>
+        <button class="case-action" type="button" data-open-case="mcp_destructive_tool" aria-haspopup="dialog">
+          Review evidence
+          <span aria-hidden="true">→</span>
+        </button>
+      </article>
+
+      <article class="case-card" id="prompt_rubric_drift" data-case data-domain="agent" data-tool="prompt-rubric-drift" data-search="prompt_rubric_drift agent prompt and rubric drift changes scoring boundaries a synthetic pr removes evidence criteria while tightening factuality language. rubric-drift rubric weights changed and evidence criterion was removed prompt-rubric-drift">
+        <div class="case-card__meta">
+          <span class="domain-label">agent</span>
+          <span class="data-label">Synthetic data</span>
+        </div>
+        <h2>Prompt and rubric drift changes scoring boundaries</h2>
+        <p>A synthetic PR removes evidence criteria while tightening factuality language.</p>
+        <dl>
+          <div><dt>Tool</dt><dd>prompt-rubric-drift</dd></div>
+          <div><dt>Source</dt><dd><code>cases/prompt_rubric_drift/case.json</code></dd></div>
+          <div><dt>Expected behavior</dt><dd>rubric weights changed and evidence criterion was removed</dd></div>
+        </dl>
+        <button class="case-action" type="button" data-open-case="prompt_rubric_drift" aria-haspopup="dialog">
+          Review evidence
+          <span aria-hidden="true">→</span>
+        </button>
+      </article>
+
+      <article class="case-card" id="agent_schema_drift" data-case data-domain="agent" data-tool="a2a-contract-test" data-search="agent_schema_drift agent tool schema drift breaks structured payloads the agent emits an old argument name after a tool contract changed. schema-drift tool call uses deprecated field not accepted by current tool schema a2a-contract-test">
+        <div class="case-card__meta">
+          <span class="domain-label">agent</span>
+          <span class="data-label">Synthetic data</span>
+        </div>
+        <h2>Tool schema drift breaks structured payloads</h2>
+        <p>The agent emits an old argument name after a tool contract changed.</p>
+        <dl>
+          <div><dt>Tool</dt><dd>a2a-contract-test</dd></div>
+          <div><dt>Source</dt><dd><code>cases/agent_schema_drift/case.json</code></dd></div>
+          <div><dt>Expected behavior</dt><dd>tool call uses deprecated field not accepted by current tool schema</dd></div>
+        </dl>
+        <button class="case-action" type="button" data-open-case="agent_schema_drift" aria-haspopup="dialog">
+          Review evidence
+          <span aria-hidden="true">→</span>
+        </button>
+      </article>
+
+      <article class="case-card" id="otel_trace_privacy_leak" data-case data-domain="agent" data-tool="otel-eval-bridge" data-search="otel_trace_privacy_leak agent trace export contains email and bearer token a synthetic genai trace includes sensitive values in prompt attributes. trace-redaction eval case extraction redacts email and bearer token before export otel-eval-bridge">
+        <div class="case-card__meta">
+          <span class="domain-label">agent</span>
+          <span class="data-label">Synthetic data</span>
+        </div>
+        <h2>Trace export contains email and bearer token</h2>
+        <p>A synthetic GenAI trace includes sensitive values in prompt attributes.</p>
+        <dl>
+          <div><dt>Tool</dt><dd>otel-eval-bridge</dd></div>
+          <div><dt>Source</dt><dd><code>cases/otel_trace_privacy_leak/case.json</code></dd></div>
+          <div><dt>Expected behavior</dt><dd>eval case extraction redacts email and bearer token before export</dd></div>
+        </dl>
+        <button class="case-action" type="button" data-open-case="otel_trace_privacy_leak" aria-haspopup="dialog">
+          Review evidence
+          <span aria-hidden="true">→</span>
+        </button>
+      </article>
+
+      <article class="case-card" id="agent_trace_missing_decision" data-case data-domain="agent" data-tool="agent-trace-card" data-search="agent_trace_missing_decision agent trace lacks decision rationale for escalation a synthetic support trace escalates without a durable decision record. trace-card-gap trace card missing decision rationale and escalation evidence agent-trace-card">
+        <div class="case-card__meta">
+          <span class="domain-label">agent</span>
+          <span class="data-label">Synthetic data</span>
+        </div>
+        <h2>Trace lacks decision rationale for escalation</h2>
+        <p>A synthetic support trace escalates without a durable decision record.</p>
+        <dl>
+          <div><dt>Tool</dt><dd>agent-trace-card</dd></div>
+          <div><dt>Source</dt><dd><code>cases/agent_trace_missing_decision/case.json</code></dd></div>
+          <div><dt>Expected behavior</dt><dd>trace card missing decision rationale and escalation evidence</dd></div>
+        </dl>
+        <button class="case-action" type="button" data-open-case="agent_trace_missing_decision" aria-haspopup="dialog">
+          Review evidence
+          <span aria-hidden="true">→</span>
+        </button>
+      </article>
+
+      <article class="case-card" id="robot_camera_shift_brittle" data-case data-domain="robotics" data-tool="vla-robustness-kit" data-search="robot_camera_shift_brittle robotics camera shift causes vla failure cluster a synthetic episode set shows brittleness when camera pose metadata changes. vision-robustness camera_shift appears as a repeated failure cluster vla-robustness-kit">
+        <div class="case-card__meta">
+          <span class="domain-label">robotics</span>
+          <span class="data-label">Synthetic data</span>
+        </div>
+        <h2>Camera shift causes VLA failure cluster</h2>
+        <p>A synthetic episode set shows brittleness when camera pose metadata changes.</p>
+        <dl>
+          <div><dt>Tool</dt><dd>vla-robustness-kit</dd></div>
+          <div><dt>Source</dt><dd><code>cases/robot_camera_shift_brittle/case.json</code></dd></div>
+          <div><dt>Expected behavior</dt><dd>camera_shift appears as a repeated failure cluster</dd></div>
+        </dl>
+        <button class="case-action" type="button" data-open-case="robot_camera_shift_brittle" aria-haspopup="dialog">
+          Review evidence
+          <span aria-hidden="true">→</span>
+        </button>
+      </article>
+
+      <article class="case-card" id="robot_missing_coordinate_frame" data-case data-domain="robotics" data-tool="embodiment-card" data-search="robot_missing_coordinate_frame robotics dataset card omits coordinate frames a synthetic robot dataset describes cameras and actions but omits frame definitions. embodiment-metadata-gap schema validation catches missing coordinate_frames embodiment-card">
+        <div class="case-card__meta">
+          <span class="domain-label">robotics</span>
+          <span class="data-label">Synthetic data</span>
+        </div>
+        <h2>Dataset card omits coordinate frames</h2>
+        <p>A synthetic robot dataset describes cameras and actions but omits frame definitions.</p>
+        <dl>
+          <div><dt>Tool</dt><dd>embodiment-card</dd></div>
+          <div><dt>Source</dt><dd><code>cases/robot_missing_coordinate_frame/case.json</code></dd></div>
+          <div><dt>Expected behavior</dt><dd>schema validation catches missing coordinate_frames</dd></div>
+        </dl>
+        <button class="case-action" type="button" data-open-case="robot_missing_coordinate_frame" aria-haspopup="dialog">
+          Review evidence
+          <span aria-hidden="true">→</span>
+        </button>
+      </article>
+
+      <article class="case-card" id="robot_low_quality_episode" data-case data-domain="robotics" data-tool="lerobot-quality-gates" data-search="robot_low_quality_episode robotics low-quality robot episode passes casual inspection a synthetic dataset has missing actions, short episodes, and inconsistent metadata. dataset-quality quality gates produce multiple findings before training lerobot-quality-gates">
+        <div class="case-card__meta">
+          <span class="domain-label">robotics</span>
+          <span class="data-label">Synthetic data</span>
+        </div>
+        <h2>Low-quality robot episode passes casual inspection</h2>
+        <p>A synthetic dataset has missing actions, short episodes, and inconsistent metadata.</p>
+        <dl>
+          <div><dt>Tool</dt><dd>lerobot-quality-gates</dd></div>
+          <div><dt>Source</dt><dd><code>cases/robot_low_quality_episode/case.json</code></dd></div>
+          <div><dt>Expected behavior</dt><dd>quality gates produce multiple findings before training</dd></div>
+        </dl>
+        <button class="case-action" type="button" data-open-case="robot_low_quality_episode" aria-haspopup="dialog">
+          Review evidence
+          <span aria-hidden="true">→</span>
+        </button>
+      </article>
+
+      <article class="case-card" id="robot_recovery_missing_label" data-case data-domain="robotics" data-tool="robot-recovery-bench" data-search="robot_recovery_missing_label robotics recovery segment lacks intervention label a synthetic recovery segment omits the intervention type and recovery result. recovery-label-gap segment is not training-ready because recovery metadata is incomplete robot-recovery-bench">
+        <div class="case-card__meta">
+          <span class="domain-label">robotics</span>
+          <span class="data-label">Synthetic data</span>
+        </div>
+        <h2>Recovery segment lacks intervention label</h2>
+        <p>A synthetic recovery segment omits the intervention type and recovery result.</p>
+        <dl>
+          <div><dt>Tool</dt><dd>robot-recovery-bench</dd></div>
+          <div><dt>Source</dt><dd><code>cases/robot_recovery_missing_label/case.json</code></dd></div>
+          <div><dt>Expected behavior</dt><dd>segment is not training-ready because recovery metadata is incomplete</dd></div>
+        </dl>
+        <button class="case-action" type="button" data-open-case="robot_recovery_missing_label" aria-haspopup="dialog">
+          Review evidence
+          <span aria-hidden="true">→</span>
+        </button>
+      </article>
+
+      <article class="case-card" id="robot_sensor_desync" data-case data-domain="robotics" data-tool="lerobot-quality-gates" data-search="robot_sensor_desync robotics robot episode has sensor timestamp desync a synthetic lerobot-style episode has camera frames lagging proprioception. sensor-desync episode fails timestamp alignment gate lerobot-quality-gates">
+        <div class="case-card__meta">
+          <span class="domain-label">robotics</span>
+          <span class="data-label">Synthetic data</span>
+        </div>
+        <h2>Robot episode has sensor timestamp desync</h2>
+        <p>A synthetic LeRobot-style episode has camera frames lagging proprioception.</p>
+        <dl>
+          <div><dt>Tool</dt><dd>lerobot-quality-gates</dd></div>
+          <div><dt>Source</dt><dd><code>cases/robot_sensor_desync/case.json</code></dd></div>
+          <div><dt>Expected behavior</dt><dd>episode fails timestamp alignment gate</dd></div>
+        </dl>
+        <button class="case-action" type="button" data-open-case="robot_sensor_desync" aria-haspopup="dialog">
+          Review evidence
+          <span aria-hidden="true">→</span>
+        </button>
+      </article>
+
+      <article class="case-card" id="vla_instruction_paraphrase_failure" data-case data-domain="robotics" data-tool="vla-robustness-kit" data-search="vla_instruction_paraphrase_failure robotics vla policy fails instruction paraphrases a synthetic vla policy passes the original command but fails equivalent polite wording. language-robustness language perturbation family has low pass rate vla-robustness-kit">
+        <div class="case-card__meta">
+          <span class="domain-label">robotics</span>
+          <span class="data-label">Synthetic data</span>
+        </div>
+        <h2>VLA policy fails instruction paraphrases</h2>
+        <p>A synthetic VLA policy passes the original command but fails equivalent polite wording.</p>
+        <dl>
+          <div><dt>Tool</dt><dd>vla-robustness-kit</dd></div>
+          <div><dt>Source</dt><dd><code>cases/vla_instruction_paraphrase_failure/case.json</code></dd></div>
+          <div><dt>Expected behavior</dt><dd>language perturbation family has low pass rate</dd></div>
+        </dl>
+        <button class="case-action" type="button" data-open-case="vla_instruction_paraphrase_failure" aria-haspopup="dialog">
+          Review evidence
+          <span aria-hidden="true">→</span>
+        </button>
+      </article>
+      </div>
+      <div class="no-results" data-no-results hidden>
+        <strong>No matching records</strong>
+        <p>Clear filters or search for a domain, tool, review label, or expected finding.</p>
+      </div>
     </section>
 
-    <section class="glass-panel note">
-      <strong>Built for public review, not leaderboard claims.</strong>
-      <p>
-        Use this gallery as reproducible review material for AuraOne Open v2
-        tools. The page uses AuraGlass-inspired visual language to keep public
-        OSS surfaces consistent with the AuraOne brand and readable for
-        engineers, labs, and robotics data teams.
-      </p>
+    <section class="method" aria-labelledby="method-title">
+      <div>
+        <p class="eyebrow">Evidence contract</p>
+        <h2 id="method-title">Read the record before running the command.</h2>
+      </div>
+      <ol>
+        <li><strong>Inspect</strong><span>Confirm the synthetic source and stated failure.</span></li>
+        <li><strong>Reproduce</strong><span>Run the exact local command in the linked tool.</span></li>
+        <li><strong>Compare</strong><span>Check observed evidence against the expected behavior and limitations.</span></li>
+      </ol>
     </section>
   </main>
+
+  <footer class="site-footer">
+    <span>AuraOne Open · Synthetic evidence only</span>
+    <a href="https://www.auraone.ai/open/robotics-studio/failure-gallery">Canonical AuraOne route</a>
+  </footer>
+
+
+    <dialog class="case-dialog" id="dialog-agent_tool_loop" aria-labelledby="dialog-agent_tool_loop-title">
+      <div class="dialog-shell">
+        <header>
+          <div>
+            <p class="eyebrow">agent failure record</p>
+            <h2 id="dialog-agent_tool_loop-title">Agent repeats a failing refund lookup tool</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close failure record">×</button>
+        </header>
+        <div class="dialog-body">
+          <section class="record-section" aria-labelledby="failure-agent_tool_loop">
+            <h3 id="failure-agent_tool_loop">Failure</h3>
+            <p>A synthetic trace loops on the same tool call after identical 404 responses.</p>
+          </section>
+          <div class="record-grid">
+            <section class="record-section">
+              <h3>Domain</h3>
+              <p>agent</p>
+            </section>
+            <section class="record-section">
+              <h3>Related tool</h3>
+              <p>tool-call-replay</p>
+            </section>
+            <section class="record-section">
+              <h3>Review label</h3>
+              <p><code>tool-call-loop</code></p>
+            </section>
+            <section class="record-section">
+              <h3>Source</h3>
+              <p><code>cases/agent_tool_loop/case.json</code></p>
+            </section>
+          </div>
+          <section class="record-section">
+            <h3>Expected behavior</h3>
+            <p>retry policy missing terminal guard after repeated identical tool errors</p>
+          </section>
+          <section class="record-section">
+            <h3>Evidence</h3>
+            <p>
+              The fixture is designed to produce the <code>tool-call-loop</code>
+              finding when reviewed with tool-call-replay. Compare the tool output with the expected
+              behavior above; no production result is asserted by this gallery.
+            </p>
+          </section>
+          <section class="record-section">
+            <h3>Reproduce locally</h3>
+            <div class="command-block">
+              <code>tool-call-replay run examples/failed_refund_trace.json --scenario examples/refund_scenario.yaml</code>
+              <button type="button" data-copy-command="tool-call-replay run examples/failed_refund_trace.json --scenario examples/refund_scenario.yaml">Copy command</button>
+            </div>
+          </section>
+          <section class="record-section limitations">
+            <h3>Limitations</h3>
+            <p>Synthetic tutorial evidence only. This record does not represent a customer incident, production benchmark, or validated model comparison.</p>
+          </section>
+        </div>
+        <footer>
+          <a href="#agent_tool_loop" data-copy-record-link>Link to this record</a>
+          <button class="secondary-button" type="button" data-close-dialog>Done</button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog class="case-dialog" id="dialog-mcp_destructive_tool" aria-labelledby="dialog-mcp_destructive_tool-title">
+      <div class="dialog-shell">
+        <header>
+          <div>
+            <p class="eyebrow">agent failure record</p>
+            <h2 id="dialog-mcp_destructive_tool-title">MCP server exposes destructive tool without confirmation</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close failure record">×</button>
+        </header>
+        <div class="dialog-body">
+          <section class="record-section" aria-labelledby="failure-mcp_destructive_tool">
+            <h3 id="failure-mcp_destructive_tool">Failure</h3>
+            <p>A synthetic MCP manifest declares a delete operation without guard metadata.</p>
+          </section>
+          <div class="record-grid">
+            <section class="record-section">
+              <h3>Domain</h3>
+              <p>agent</p>
+            </section>
+            <section class="record-section">
+              <h3>Related tool</h3>
+              <p>mcp-risk-linter</p>
+            </section>
+            <section class="record-section">
+              <h3>Review label</h3>
+              <p><code>mcp-risk</code></p>
+            </section>
+            <section class="record-section">
+              <h3>Source</h3>
+              <p><code>cases/mcp_destructive_tool/case.json</code></p>
+            </section>
+          </div>
+          <section class="record-section">
+            <h3>Expected behavior</h3>
+            <p>destructive capability lacks confirmation and scope boundaries</p>
+          </section>
+          <section class="record-section">
+            <h3>Evidence</h3>
+            <p>
+              The fixture is designed to produce the <code>mcp-risk</code>
+              finding when reviewed with mcp-risk-linter. Compare the tool output with the expected
+              behavior above; no production result is asserted by this gallery.
+            </p>
+          </section>
+          <section class="record-section">
+            <h3>Reproduce locally</h3>
+            <div class="command-block">
+              <code>mcp-risk-linter lint examples/risky_server.json --out report.md</code>
+              <button type="button" data-copy-command="mcp-risk-linter lint examples/risky_server.json --out report.md">Copy command</button>
+            </div>
+          </section>
+          <section class="record-section limitations">
+            <h3>Limitations</h3>
+            <p>Synthetic tutorial evidence only. This record does not represent a customer incident, production benchmark, or validated model comparison.</p>
+          </section>
+        </div>
+        <footer>
+          <a href="#mcp_destructive_tool" data-copy-record-link>Link to this record</a>
+          <button class="secondary-button" type="button" data-close-dialog>Done</button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog class="case-dialog" id="dialog-prompt_rubric_drift" aria-labelledby="dialog-prompt_rubric_drift-title">
+      <div class="dialog-shell">
+        <header>
+          <div>
+            <p class="eyebrow">agent failure record</p>
+            <h2 id="dialog-prompt_rubric_drift-title">Prompt and rubric drift changes scoring boundaries</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close failure record">×</button>
+        </header>
+        <div class="dialog-body">
+          <section class="record-section" aria-labelledby="failure-prompt_rubric_drift">
+            <h3 id="failure-prompt_rubric_drift">Failure</h3>
+            <p>A synthetic PR removes evidence criteria while tightening factuality language.</p>
+          </section>
+          <div class="record-grid">
+            <section class="record-section">
+              <h3>Domain</h3>
+              <p>agent</p>
+            </section>
+            <section class="record-section">
+              <h3>Related tool</h3>
+              <p>prompt-rubric-drift</p>
+            </section>
+            <section class="record-section">
+              <h3>Review label</h3>
+              <p><code>rubric-drift</code></p>
+            </section>
+            <section class="record-section">
+              <h3>Source</h3>
+              <p><code>cases/prompt_rubric_drift/case.json</code></p>
+            </section>
+          </div>
+          <section class="record-section">
+            <h3>Expected behavior</h3>
+            <p>rubric weights changed and evidence criterion was removed</p>
+          </section>
+          <section class="record-section">
+            <h3>Evidence</h3>
+            <p>
+              The fixture is designed to produce the <code>rubric-drift</code>
+              finding when reviewed with prompt-rubric-drift. Compare the tool output with the expected
+              behavior above; no production result is asserted by this gallery.
+            </p>
+          </section>
+          <section class="record-section">
+            <h3>Reproduce locally</h3>
+            <div class="command-block">
+              <code>prompt-rubric-drift compare examples/before examples/after --out report.md</code>
+              <button type="button" data-copy-command="prompt-rubric-drift compare examples/before examples/after --out report.md">Copy command</button>
+            </div>
+          </section>
+          <section class="record-section limitations">
+            <h3>Limitations</h3>
+            <p>Synthetic tutorial evidence only. This record does not represent a customer incident, production benchmark, or validated model comparison.</p>
+          </section>
+        </div>
+        <footer>
+          <a href="#prompt_rubric_drift" data-copy-record-link>Link to this record</a>
+          <button class="secondary-button" type="button" data-close-dialog>Done</button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog class="case-dialog" id="dialog-agent_schema_drift" aria-labelledby="dialog-agent_schema_drift-title">
+      <div class="dialog-shell">
+        <header>
+          <div>
+            <p class="eyebrow">agent failure record</p>
+            <h2 id="dialog-agent_schema_drift-title">Tool schema drift breaks structured payloads</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close failure record">×</button>
+        </header>
+        <div class="dialog-body">
+          <section class="record-section" aria-labelledby="failure-agent_schema_drift">
+            <h3 id="failure-agent_schema_drift">Failure</h3>
+            <p>The agent emits an old argument name after a tool contract changed.</p>
+          </section>
+          <div class="record-grid">
+            <section class="record-section">
+              <h3>Domain</h3>
+              <p>agent</p>
+            </section>
+            <section class="record-section">
+              <h3>Related tool</h3>
+              <p>a2a-contract-test</p>
+            </section>
+            <section class="record-section">
+              <h3>Review label</h3>
+              <p><code>schema-drift</code></p>
+            </section>
+            <section class="record-section">
+              <h3>Source</h3>
+              <p><code>cases/agent_schema_drift/case.json</code></p>
+            </section>
+          </div>
+          <section class="record-section">
+            <h3>Expected behavior</h3>
+            <p>tool call uses deprecated field not accepted by current tool schema</p>
+          </section>
+          <section class="record-section">
+            <h3>Evidence</h3>
+            <p>
+              The fixture is designed to produce the <code>schema-drift</code>
+              finding when reviewed with a2a-contract-test. Compare the tool output with the expected
+              behavior above; no production result is asserted by this gallery.
+            </p>
+          </section>
+          <section class="record-section">
+            <h3>Reproduce locally</h3>
+            <div class="command-block">
+              <code>a2a-contract-test run --agent-card examples/failing_agent/agent-card.json</code>
+              <button type="button" data-copy-command="a2a-contract-test run --agent-card examples/failing_agent/agent-card.json">Copy command</button>
+            </div>
+          </section>
+          <section class="record-section limitations">
+            <h3>Limitations</h3>
+            <p>Synthetic tutorial evidence only. This record does not represent a customer incident, production benchmark, or validated model comparison.</p>
+          </section>
+        </div>
+        <footer>
+          <a href="#agent_schema_drift" data-copy-record-link>Link to this record</a>
+          <button class="secondary-button" type="button" data-close-dialog>Done</button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog class="case-dialog" id="dialog-otel_trace_privacy_leak" aria-labelledby="dialog-otel_trace_privacy_leak-title">
+      <div class="dialog-shell">
+        <header>
+          <div>
+            <p class="eyebrow">agent failure record</p>
+            <h2 id="dialog-otel_trace_privacy_leak-title">Trace export contains email and bearer token</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close failure record">×</button>
+        </header>
+        <div class="dialog-body">
+          <section class="record-section" aria-labelledby="failure-otel_trace_privacy_leak">
+            <h3 id="failure-otel_trace_privacy_leak">Failure</h3>
+            <p>A synthetic GenAI trace includes sensitive values in prompt attributes.</p>
+          </section>
+          <div class="record-grid">
+            <section class="record-section">
+              <h3>Domain</h3>
+              <p>agent</p>
+            </section>
+            <section class="record-section">
+              <h3>Related tool</h3>
+              <p>otel-eval-bridge</p>
+            </section>
+            <section class="record-section">
+              <h3>Review label</h3>
+              <p><code>trace-redaction</code></p>
+            </section>
+            <section class="record-section">
+              <h3>Source</h3>
+              <p><code>cases/otel_trace_privacy_leak/case.json</code></p>
+            </section>
+          </div>
+          <section class="record-section">
+            <h3>Expected behavior</h3>
+            <p>eval case extraction redacts email and bearer token before export</p>
+          </section>
+          <section class="record-section">
+            <h3>Evidence</h3>
+            <p>
+              The fixture is designed to produce the <code>trace-redaction</code>
+              finding when reviewed with otel-eval-bridge. Compare the tool output with the expected
+              behavior above; no production result is asserted by this gallery.
+            </p>
+          </section>
+          <section class="record-section">
+            <h3>Reproduce locally</h3>
+            <div class="command-block">
+              <code>otel-eval-bridge extract examples/genai_trace.json --out eval_cases.jsonl</code>
+              <button type="button" data-copy-command="otel-eval-bridge extract examples/genai_trace.json --out eval_cases.jsonl">Copy command</button>
+            </div>
+          </section>
+          <section class="record-section limitations">
+            <h3>Limitations</h3>
+            <p>Synthetic tutorial evidence only. This record does not represent a customer incident, production benchmark, or validated model comparison.</p>
+          </section>
+        </div>
+        <footer>
+          <a href="#otel_trace_privacy_leak" data-copy-record-link>Link to this record</a>
+          <button class="secondary-button" type="button" data-close-dialog>Done</button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog class="case-dialog" id="dialog-agent_trace_missing_decision" aria-labelledby="dialog-agent_trace_missing_decision-title">
+      <div class="dialog-shell">
+        <header>
+          <div>
+            <p class="eyebrow">agent failure record</p>
+            <h2 id="dialog-agent_trace_missing_decision-title">Trace lacks decision rationale for escalation</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close failure record">×</button>
+        </header>
+        <div class="dialog-body">
+          <section class="record-section" aria-labelledby="failure-agent_trace_missing_decision">
+            <h3 id="failure-agent_trace_missing_decision">Failure</h3>
+            <p>A synthetic support trace escalates without a durable decision record.</p>
+          </section>
+          <div class="record-grid">
+            <section class="record-section">
+              <h3>Domain</h3>
+              <p>agent</p>
+            </section>
+            <section class="record-section">
+              <h3>Related tool</h3>
+              <p>agent-trace-card</p>
+            </section>
+            <section class="record-section">
+              <h3>Review label</h3>
+              <p><code>trace-card-gap</code></p>
+            </section>
+            <section class="record-section">
+              <h3>Source</h3>
+              <p><code>cases/agent_trace_missing_decision/case.json</code></p>
+            </section>
+          </div>
+          <section class="record-section">
+            <h3>Expected behavior</h3>
+            <p>trace card missing decision rationale and escalation evidence</p>
+          </section>
+          <section class="record-section">
+            <h3>Evidence</h3>
+            <p>
+              The fixture is designed to produce the <code>trace-card-gap</code>
+              finding when reviewed with agent-trace-card. Compare the tool output with the expected
+              behavior above; no production result is asserted by this gallery.
+            </p>
+          </section>
+          <section class="record-section">
+            <h3>Reproduce locally</h3>
+            <div class="command-block">
+              <code>agent-trace-card generate examples/support_trace.json --out card.md</code>
+              <button type="button" data-copy-command="agent-trace-card generate examples/support_trace.json --out card.md">Copy command</button>
+            </div>
+          </section>
+          <section class="record-section limitations">
+            <h3>Limitations</h3>
+            <p>Synthetic tutorial evidence only. This record does not represent a customer incident, production benchmark, or validated model comparison.</p>
+          </section>
+        </div>
+        <footer>
+          <a href="#agent_trace_missing_decision" data-copy-record-link>Link to this record</a>
+          <button class="secondary-button" type="button" data-close-dialog>Done</button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog class="case-dialog" id="dialog-robot_camera_shift_brittle" aria-labelledby="dialog-robot_camera_shift_brittle-title">
+      <div class="dialog-shell">
+        <header>
+          <div>
+            <p class="eyebrow">robotics failure record</p>
+            <h2 id="dialog-robot_camera_shift_brittle-title">Camera shift causes VLA failure cluster</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close failure record">×</button>
+        </header>
+        <div class="dialog-body">
+          <section class="record-section" aria-labelledby="failure-robot_camera_shift_brittle">
+            <h3 id="failure-robot_camera_shift_brittle">Failure</h3>
+            <p>A synthetic episode set shows brittleness when camera pose metadata changes.</p>
+          </section>
+          <div class="record-grid">
+            <section class="record-section">
+              <h3>Domain</h3>
+              <p>robotics</p>
+            </section>
+            <section class="record-section">
+              <h3>Related tool</h3>
+              <p>vla-robustness-kit</p>
+            </section>
+            <section class="record-section">
+              <h3>Review label</h3>
+              <p><code>vision-robustness</code></p>
+            </section>
+            <section class="record-section">
+              <h3>Source</h3>
+              <p><code>cases/robot_camera_shift_brittle/case.json</code></p>
+            </section>
+          </div>
+          <section class="record-section">
+            <h3>Expected behavior</h3>
+            <p>camera_shift appears as a repeated failure cluster</p>
+          </section>
+          <section class="record-section">
+            <h3>Evidence</h3>
+            <p>
+              The fixture is designed to produce the <code>vision-robustness</code>
+              finding when reviewed with vla-robustness-kit. Compare the tool output with the expected
+              behavior above; no production result is asserted by this gallery.
+            </p>
+          </section>
+          <section class="record-section">
+            <h3>Reproduce locally</h3>
+            <div class="command-block">
+              <code>vla-robustness-kit run examples/mock_episode_set --policy mock --out report.md</code>
+              <button type="button" data-copy-command="vla-robustness-kit run examples/mock_episode_set --policy mock --out report.md">Copy command</button>
+            </div>
+          </section>
+          <section class="record-section limitations">
+            <h3>Limitations</h3>
+            <p>Synthetic tutorial evidence only. This record does not represent a customer incident, production benchmark, or validated model comparison.</p>
+          </section>
+        </div>
+        <footer>
+          <a href="#robot_camera_shift_brittle" data-copy-record-link>Link to this record</a>
+          <button class="secondary-button" type="button" data-close-dialog>Done</button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog class="case-dialog" id="dialog-robot_missing_coordinate_frame" aria-labelledby="dialog-robot_missing_coordinate_frame-title">
+      <div class="dialog-shell">
+        <header>
+          <div>
+            <p class="eyebrow">robotics failure record</p>
+            <h2 id="dialog-robot_missing_coordinate_frame-title">Dataset card omits coordinate frames</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close failure record">×</button>
+        </header>
+        <div class="dialog-body">
+          <section class="record-section" aria-labelledby="failure-robot_missing_coordinate_frame">
+            <h3 id="failure-robot_missing_coordinate_frame">Failure</h3>
+            <p>A synthetic robot dataset describes cameras and actions but omits frame definitions.</p>
+          </section>
+          <div class="record-grid">
+            <section class="record-section">
+              <h3>Domain</h3>
+              <p>robotics</p>
+            </section>
+            <section class="record-section">
+              <h3>Related tool</h3>
+              <p>embodiment-card</p>
+            </section>
+            <section class="record-section">
+              <h3>Review label</h3>
+              <p><code>embodiment-metadata-gap</code></p>
+            </section>
+            <section class="record-section">
+              <h3>Source</h3>
+              <p><code>cases/robot_missing_coordinate_frame/case.json</code></p>
+            </section>
+          </div>
+          <section class="record-section">
+            <h3>Expected behavior</h3>
+            <p>schema validation catches missing coordinate_frames</p>
+          </section>
+          <section class="record-section">
+            <h3>Evidence</h3>
+            <p>
+              The fixture is designed to produce the <code>embodiment-metadata-gap</code>
+              finding when reviewed with embodiment-card. Compare the tool output with the expected
+              behavior above; no production result is asserted by this gallery.
+            </p>
+          </section>
+          <section class="record-section">
+            <h3>Reproduce locally</h3>
+            <div class="command-block">
+              <code>embodiment-card validate examples/mock_so101_card.json</code>
+              <button type="button" data-copy-command="embodiment-card validate examples/mock_so101_card.json">Copy command</button>
+            </div>
+          </section>
+          <section class="record-section limitations">
+            <h3>Limitations</h3>
+            <p>Synthetic tutorial evidence only. This record does not represent a customer incident, production benchmark, or validated model comparison.</p>
+          </section>
+        </div>
+        <footer>
+          <a href="#robot_missing_coordinate_frame" data-copy-record-link>Link to this record</a>
+          <button class="secondary-button" type="button" data-close-dialog>Done</button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog class="case-dialog" id="dialog-robot_low_quality_episode" aria-labelledby="dialog-robot_low_quality_episode-title">
+      <div class="dialog-shell">
+        <header>
+          <div>
+            <p class="eyebrow">robotics failure record</p>
+            <h2 id="dialog-robot_low_quality_episode-title">Low-quality robot episode passes casual inspection</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close failure record">×</button>
+        </header>
+        <div class="dialog-body">
+          <section class="record-section" aria-labelledby="failure-robot_low_quality_episode">
+            <h3 id="failure-robot_low_quality_episode">Failure</h3>
+            <p>A synthetic dataset has missing actions, short episodes, and inconsistent metadata.</p>
+          </section>
+          <div class="record-grid">
+            <section class="record-section">
+              <h3>Domain</h3>
+              <p>robotics</p>
+            </section>
+            <section class="record-section">
+              <h3>Related tool</h3>
+              <p>lerobot-quality-gates</p>
+            </section>
+            <section class="record-section">
+              <h3>Review label</h3>
+              <p><code>dataset-quality</code></p>
+            </section>
+            <section class="record-section">
+              <h3>Source</h3>
+              <p><code>cases/robot_low_quality_episode/case.json</code></p>
+            </section>
+          </div>
+          <section class="record-section">
+            <h3>Expected behavior</h3>
+            <p>quality gates produce multiple findings before training</p>
+          </section>
+          <section class="record-section">
+            <h3>Evidence</h3>
+            <p>
+              The fixture is designed to produce the <code>dataset-quality</code>
+              finding when reviewed with lerobot-quality-gates. Compare the tool output with the expected
+              behavior above; no production result is asserted by this gallery.
+            </p>
+          </section>
+          <section class="record-section">
+            <h3>Reproduce locally</h3>
+            <div class="command-block">
+              <code>lerobot-quality-gates check examples/bad_dataset --out report.md</code>
+              <button type="button" data-copy-command="lerobot-quality-gates check examples/bad_dataset --out report.md">Copy command</button>
+            </div>
+          </section>
+          <section class="record-section limitations">
+            <h3>Limitations</h3>
+            <p>Synthetic tutorial evidence only. This record does not represent a customer incident, production benchmark, or validated model comparison.</p>
+          </section>
+        </div>
+        <footer>
+          <a href="#robot_low_quality_episode" data-copy-record-link>Link to this record</a>
+          <button class="secondary-button" type="button" data-close-dialog>Done</button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog class="case-dialog" id="dialog-robot_recovery_missing_label" aria-labelledby="dialog-robot_recovery_missing_label-title">
+      <div class="dialog-shell">
+        <header>
+          <div>
+            <p class="eyebrow">robotics failure record</p>
+            <h2 id="dialog-robot_recovery_missing_label-title">Recovery segment lacks intervention label</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close failure record">×</button>
+        </header>
+        <div class="dialog-body">
+          <section class="record-section" aria-labelledby="failure-robot_recovery_missing_label">
+            <h3 id="failure-robot_recovery_missing_label">Failure</h3>
+            <p>A synthetic recovery segment omits the intervention type and recovery result.</p>
+          </section>
+          <div class="record-grid">
+            <section class="record-section">
+              <h3>Domain</h3>
+              <p>robotics</p>
+            </section>
+            <section class="record-section">
+              <h3>Related tool</h3>
+              <p>robot-recovery-bench</p>
+            </section>
+            <section class="record-section">
+              <h3>Review label</h3>
+              <p><code>recovery-label-gap</code></p>
+            </section>
+            <section class="record-section">
+              <h3>Source</h3>
+              <p><code>cases/robot_recovery_missing_label/case.json</code></p>
+            </section>
+          </div>
+          <section class="record-section">
+            <h3>Expected behavior</h3>
+            <p>segment is not training-ready because recovery metadata is incomplete</p>
+          </section>
+          <section class="record-section">
+            <h3>Evidence</h3>
+            <p>
+              The fixture is designed to produce the <code>recovery-label-gap</code>
+              finding when reviewed with robot-recovery-bench. Compare the tool output with the expected
+              behavior above; no production result is asserted by this gallery.
+            </p>
+          </section>
+          <section class="record-section">
+            <h3>Reproduce locally</h3>
+            <div class="command-block">
+              <code>robot-recovery-bench validate examples/mock_invalid_segments.jsonl</code>
+              <button type="button" data-copy-command="robot-recovery-bench validate examples/mock_invalid_segments.jsonl">Copy command</button>
+            </div>
+          </section>
+          <section class="record-section limitations">
+            <h3>Limitations</h3>
+            <p>Synthetic tutorial evidence only. This record does not represent a customer incident, production benchmark, or validated model comparison.</p>
+          </section>
+        </div>
+        <footer>
+          <a href="#robot_recovery_missing_label" data-copy-record-link>Link to this record</a>
+          <button class="secondary-button" type="button" data-close-dialog>Done</button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog class="case-dialog" id="dialog-robot_sensor_desync" aria-labelledby="dialog-robot_sensor_desync-title">
+      <div class="dialog-shell">
+        <header>
+          <div>
+            <p class="eyebrow">robotics failure record</p>
+            <h2 id="dialog-robot_sensor_desync-title">Robot episode has sensor timestamp desync</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close failure record">×</button>
+        </header>
+        <div class="dialog-body">
+          <section class="record-section" aria-labelledby="failure-robot_sensor_desync">
+            <h3 id="failure-robot_sensor_desync">Failure</h3>
+            <p>A synthetic LeRobot-style episode has camera frames lagging proprioception.</p>
+          </section>
+          <div class="record-grid">
+            <section class="record-section">
+              <h3>Domain</h3>
+              <p>robotics</p>
+            </section>
+            <section class="record-section">
+              <h3>Related tool</h3>
+              <p>lerobot-quality-gates</p>
+            </section>
+            <section class="record-section">
+              <h3>Review label</h3>
+              <p><code>sensor-desync</code></p>
+            </section>
+            <section class="record-section">
+              <h3>Source</h3>
+              <p><code>cases/robot_sensor_desync/case.json</code></p>
+            </section>
+          </div>
+          <section class="record-section">
+            <h3>Expected behavior</h3>
+            <p>episode fails timestamp alignment gate</p>
+          </section>
+          <section class="record-section">
+            <h3>Evidence</h3>
+            <p>
+              The fixture is designed to produce the <code>sensor-desync</code>
+              finding when reviewed with lerobot-quality-gates. Compare the tool output with the expected
+              behavior above; no production result is asserted by this gallery.
+            </p>
+          </section>
+          <section class="record-section">
+            <h3>Reproduce locally</h3>
+            <div class="command-block">
+              <code>lerobot-quality-gates check examples/bad_dataset --out report.md</code>
+              <button type="button" data-copy-command="lerobot-quality-gates check examples/bad_dataset --out report.md">Copy command</button>
+            </div>
+          </section>
+          <section class="record-section limitations">
+            <h3>Limitations</h3>
+            <p>Synthetic tutorial evidence only. This record does not represent a customer incident, production benchmark, or validated model comparison.</p>
+          </section>
+        </div>
+        <footer>
+          <a href="#robot_sensor_desync" data-copy-record-link>Link to this record</a>
+          <button class="secondary-button" type="button" data-close-dialog>Done</button>
+        </footer>
+      </div>
+    </dialog>
+
+    <dialog class="case-dialog" id="dialog-vla_instruction_paraphrase_failure" aria-labelledby="dialog-vla_instruction_paraphrase_failure-title">
+      <div class="dialog-shell">
+        <header>
+          <div>
+            <p class="eyebrow">robotics failure record</p>
+            <h2 id="dialog-vla_instruction_paraphrase_failure-title">VLA policy fails instruction paraphrases</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close failure record">×</button>
+        </header>
+        <div class="dialog-body">
+          <section class="record-section" aria-labelledby="failure-vla_instruction_paraphrase_failure">
+            <h3 id="failure-vla_instruction_paraphrase_failure">Failure</h3>
+            <p>A synthetic VLA policy passes the original command but fails equivalent polite wording.</p>
+          </section>
+          <div class="record-grid">
+            <section class="record-section">
+              <h3>Domain</h3>
+              <p>robotics</p>
+            </section>
+            <section class="record-section">
+              <h3>Related tool</h3>
+              <p>vla-robustness-kit</p>
+            </section>
+            <section class="record-section">
+              <h3>Review label</h3>
+              <p><code>language-robustness</code></p>
+            </section>
+            <section class="record-section">
+              <h3>Source</h3>
+              <p><code>cases/vla_instruction_paraphrase_failure/case.json</code></p>
+            </section>
+          </div>
+          <section class="record-section">
+            <h3>Expected behavior</h3>
+            <p>language perturbation family has low pass rate</p>
+          </section>
+          <section class="record-section">
+            <h3>Evidence</h3>
+            <p>
+              The fixture is designed to produce the <code>language-robustness</code>
+              finding when reviewed with vla-robustness-kit. Compare the tool output with the expected
+              behavior above; no production result is asserted by this gallery.
+            </p>
+          </section>
+          <section class="record-section">
+            <h3>Reproduce locally</h3>
+            <div class="command-block">
+              <code>vla-robustness-kit run examples/mock_episode_set --policy mock --out report.md</code>
+              <button type="button" data-copy-command="vla-robustness-kit run examples/mock_episode_set --policy mock --out report.md">Copy command</button>
+            </div>
+          </section>
+          <section class="record-section limitations">
+            <h3>Limitations</h3>
+            <p>Synthetic tutorial evidence only. This record does not represent a customer incident, production benchmark, or validated model comparison.</p>
+          </section>
+        </div>
+        <footer>
+          <a href="#vla_instruction_paraphrase_failure" data-copy-record-link>Link to this record</a>
+          <button class="secondary-button" type="button" data-close-dialog>Done</button>
+        </footer>
+      </div>
+    </dialog>
+  <script type="application/json" id="failure-gallery-data">[{"id":"agent_tool_loop","domain":"agent","title":"Agent repeats a failing refund lookup tool","description":"A synthetic trace loops on the same tool call after identical 404 responses.","review_label":"tool-call-loop","expected_finding":"retry policy missing terminal guard after repeated identical tool errors","related_tool":"tool-call-replay","reproduce_command":"tool-call-replay run examples/failed_refund_trace.json --scenario examples/refund_scenario.yaml","synthetic":true},{"id":"mcp_destructive_tool","domain":"agent","title":"MCP server exposes destructive tool without confirmation","description":"A synthetic MCP manifest declares a delete operation without guard metadata.","review_label":"mcp-risk","expected_finding":"destructive capability lacks confirmation and scope boundaries","related_tool":"mcp-risk-linter","reproduce_command":"mcp-risk-linter lint examples/risky_server.json --out report.md","synthetic":true},{"id":"prompt_rubric_drift","domain":"agent","title":"Prompt and rubric drift changes scoring boundaries","description":"A synthetic PR removes evidence criteria while tightening factuality language.","review_label":"rubric-drift","expected_finding":"rubric weights changed and evidence criterion was removed","related_tool":"prompt-rubric-drift","reproduce_command":"prompt-rubric-drift compare examples/before examples/after --out report.md","synthetic":true},{"id":"agent_schema_drift","domain":"agent","title":"Tool schema drift breaks structured payloads","description":"The agent emits an old argument name after a tool contract changed.","review_label":"schema-drift","expected_finding":"tool call uses deprecated field not accepted by current tool schema","related_tool":"a2a-contract-test","reproduce_command":"a2a-contract-test run --agent-card examples/failing_agent/agent-card.json","synthetic":true},{"id":"otel_trace_privacy_leak","domain":"agent","title":"Trace export contains email and bearer token","description":"A synthetic GenAI trace includes sensitive values in prompt attributes.","review_label":"trace-redaction","expected_finding":"eval case extraction redacts email and bearer token before export","related_tool":"otel-eval-bridge","reproduce_command":"otel-eval-bridge extract examples/genai_trace.json --out eval_cases.jsonl","synthetic":true},{"id":"agent_trace_missing_decision","domain":"agent","title":"Trace lacks decision rationale for escalation","description":"A synthetic support trace escalates without a durable decision record.","review_label":"trace-card-gap","expected_finding":"trace card missing decision rationale and escalation evidence","related_tool":"agent-trace-card","reproduce_command":"agent-trace-card generate examples/support_trace.json --out card.md","synthetic":true},{"id":"robot_camera_shift_brittle","domain":"robotics","title":"Camera shift causes VLA failure cluster","description":"A synthetic episode set shows brittleness when camera pose metadata changes.","review_label":"vision-robustness","expected_finding":"camera_shift appears as a repeated failure cluster","related_tool":"vla-robustness-kit","reproduce_command":"vla-robustness-kit run examples/mock_episode_set --policy mock --out report.md","synthetic":true},{"id":"robot_missing_coordinate_frame","domain":"robotics","title":"Dataset card omits coordinate frames","description":"A synthetic robot dataset describes cameras and actions but omits frame definitions.","review_label":"embodiment-metadata-gap","expected_finding":"schema validation catches missing coordinate_frames","related_tool":"embodiment-card","reproduce_command":"embodiment-card validate examples/mock_so101_card.json","synthetic":true},{"id":"robot_low_quality_episode","domain":"robotics","title":"Low-quality robot episode passes casual inspection","description":"A synthetic dataset has missing actions, short episodes, and inconsistent metadata.","review_label":"dataset-quality","expected_finding":"quality gates produce multiple findings before training","related_tool":"lerobot-quality-gates","reproduce_command":"lerobot-quality-gates check examples/bad_dataset --out report.md","synthetic":true},{"id":"robot_recovery_missing_label","domain":"robotics","title":"Recovery segment lacks intervention label","description":"A synthetic recovery segment omits the intervention type and recovery result.","review_label":"recovery-label-gap","expected_finding":"segment is not training-ready because recovery metadata is incomplete","related_tool":"robot-recovery-bench","reproduce_command":"robot-recovery-bench validate examples/mock_invalid_segments.jsonl","synthetic":true},{"id":"robot_sensor_desync","domain":"robotics","title":"Robot episode has sensor timestamp desync","description":"A synthetic LeRobot-style episode has camera frames lagging proprioception.","review_label":"sensor-desync","expected_finding":"episode fails timestamp alignment gate","related_tool":"lerobot-quality-gates","reproduce_command":"lerobot-quality-gates check examples/bad_dataset --out report.md","synthetic":true},{"id":"vla_instruction_paraphrase_failure","domain":"robotics","title":"VLA policy fails instruction paraphrases","description":"A synthetic VLA policy passes the original command but fails equivalent polite wording.","review_label":"language-robustness","expected_finding":"language perturbation family has low pass rate","related_tool":"vla-robustness-kit","reproduce_command":"vla-robustness-kit run examples/mock_episode_set --policy mock --out report.md","synthetic":true}]</script>
+  <script>
+(() => {
+  const form = document.querySelector("[data-filters]");
+  const cards = Array.from(document.querySelectorAll("[data-case]"));
+  const count = document.querySelector("[data-visible-count]");
+  const noResults = document.querySelector("[data-no-results]");
+
+  function applyFilters() {
+    const data = new FormData(form);
+    const query = String(data.get("query") || "").trim().toLowerCase();
+    const domain = String(data.get("domain") || "all");
+    const tool = String(data.get("tool") || "all");
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const matchesQuery = !query || card.dataset.search.includes(query);
+      const matchesDomain = domain === "all" || card.dataset.domain === domain;
+      const matchesTool = tool === "all" || card.dataset.tool === tool;
+      const matches = matchesQuery && matchesDomain && matchesTool;
+      card.hidden = !matches;
+      if (matches) visible += 1;
+    });
+
+    count.textContent = String(visible);
+    noResults.hidden = visible !== 0;
+  }
+
+  form.addEventListener("input", applyFilters);
+  form.addEventListener("reset", () => window.setTimeout(applyFilters));
+
+  document.querySelectorAll("[data-open-case]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const dialog = document.getElementById(`dialog-${button.dataset.openCase}`);
+      if (dialog && typeof dialog.showModal === "function") {
+        dialog.showModal();
+        history.replaceState(null, "", `#${button.dataset.openCase}`);
+      }
+    });
+  });
+
+  document.querySelectorAll(".case-dialog").forEach((dialog) => {
+    dialog.querySelectorAll("[data-close-dialog]").forEach((button) => {
+      button.addEventListener("click", () => dialog.close());
+    });
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  });
+
+  document.querySelectorAll("[data-copy-command]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const original = button.textContent;
+      try {
+        await navigator.clipboard.writeText(button.dataset.copyCommand);
+        button.textContent = "Copied";
+      } catch {
+        button.textContent = "Select command";
+      }
+      window.setTimeout(() => {
+        button.textContent = original;
+      }, 1600);
+    });
+  });
+
+  document.querySelectorAll("[data-copy-record-link]").forEach((link) => {
+    link.addEventListener("click", () => {
+      const dialog = link.closest("dialog");
+      if (dialog) dialog.close();
+    });
+  });
+
+  const initialId = location.hash.slice(1);
+  if (initialId) {
+    const trigger = document.querySelector(`[data-open-case="${CSS.escape(initialId)}"]`);
+    if (trigger) trigger.click();
+  }
+})();
+
+  </script>
 </body>
 </html>
