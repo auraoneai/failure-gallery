@@ -1,6 +1,51 @@
 # failure-gallery
 
-Validate and build a searchable gallery of reproducible synthetic agent and robotics failure records.
+**Reproducible robot and agent failure cases.** Validate and build a searchable
+gallery of synthetic agent and robotics failure records, each with an exact
+reproduction command.
+
+[![PyPI](https://img.shields.io/pypi/v/failure-gallery)](https://pypi.org/project/failure-gallery/)
+[![CI](https://github.com/auraoneai/failure-gallery/actions/workflows/ci.yml/badge.svg)](https://github.com/auraoneai/failure-gallery/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/auraoneai/failure-gallery/blob/main/LICENSE)
+
+From a source checkout:
+
+```bash
+python -m pip install "failure-gallery==0.2.1"
+failure-gallery validate cases/ && failure-gallery build cases/ && failure-gallery check cases/
+```
+
+Output (exit code `0`):
+
+```text
+valid
+wrote site/index.html
+wrote docs/index.html
+generated gallery is current
+```
+
+## What It Does and Doesn't Do
+
+It does:
+
+- validate case records (failure, domain, expected review label, expected
+  finding, related tool, reproduction command, synthetic-data boundary);
+- render a deterministic standalone HTML gallery and fail when generated pages
+  drift from the renderer output.
+
+It doesn't:
+
+- ship real incidents, customer data, or private-lab data; every record is a
+  synthetic tutorial;
+- produce benchmark results or prove that a related tool catches every
+  production failure.
+
+Part of the AuraOne robotics dataset QA workflow:
+[lerobot-quality-gates](https://auraone.ai/open/lerobot-quality-gates) →
+[Robotics Studio](https://auraone.ai/open/robotics-studio).
+Gallery page: [auraone.ai/open/robotics-studio/failure-gallery](https://auraone.ai/open/robotics-studio/failure-gallery).
+
+## Overview
 
 `failure-gallery` is for evaluation educators, review-tool maintainers, and robotics or agent teams that need inspectable fixtures for failure-review workflows. Its differentiator is evidence-first synthetic case design: every record names the failure, domain, expected review label, expected finding, related tool, exact reproduction command, source JSON path, and synthetic-data boundary.
 
@@ -51,3 +96,8 @@ The records are synthetic tutorials with expected review outcomes. They are not 
 ## Next Action
 
 Run `validate`, `build`, and `check`, then choose one record and execute its `reproduce_command`; investigate any mismatch with the documented `expected_finding`.
+
+---
+
+Need reviewed demonstration data or dataset quality operations at scale?
+[Talk to AuraOne](https://auraone.ai/contact?from=open:failure-gallery)
